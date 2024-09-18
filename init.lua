@@ -863,6 +863,40 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
+  {
+    'nvim-tree/nvim-tree.lua',
+    opts = {
+      update_focused_file = {
+        enable = true,
+      },
+      filters = {
+        custom = { '.DS_Store' },
+      },
+      filesystem_watchers = {
+        ignore_dirs = {
+          'node_modules',
+        },
+      },
+    },
+    config = function(_, opts)
+      require('nvim-tree').setup(opts)
+
+      vim.keymap.set('n', '<leader>ee', '<cmd>NvimTreeToggle<CR>', { desc = 'Toggle file explorer' })
+      vim.keymap.set('n', '<leader>ef', '<cmd>NvimTreeFindFile<CR>', { desc = 'Toggle file explorer on current file' })
+      vim.keymap.set('n', '<leader>ec', '<cmd>NvimTreeCollapse<CR>', { desc = 'Collapse file explorer' })
+      vim.keymap.set('n', '<leader>er', '<cmd>NvimTreeRefresh<CR>', { desc = 'Refresh file explorer' })
+
+      -- disable newtr
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+
+      -- vim-fugitive :Browse relies on netwr
+      -- updating that use systems open: https://vi.stackexchange.com/questions/38447/vim-fugitive-netrw-not-found-define-your-own-browse-to-use-gbrowse
+      vim.api.nvim_create_user_command('Browse', function(opts1)
+        vim.fn.system { 'open', opts1.fargs[1] }
+      end, { nargs = 1 })
+    end,
+  },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
